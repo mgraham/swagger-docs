@@ -50,6 +50,10 @@ module Api
         response :not_found
       end
 
+      swagger_api :new do
+        summary "Builds a new User item"
+      end
+
       # Support for Swagger complex types:
       # https://github.com/wordnik/swagger-core/wiki/Datatypes#wiki-complex-types
       swagger_model :Tag do

@@ -27,7 +27,8 @@ describe Swagger::Docs::Generator do
     stub_route("^POST$", "create", "api/v1/sample", "/api/v1/sample(.:format)"),
     stub_route("^GET$", "show", "api/v1/sample", "/api/v1/sample/:id(.:format)"),
     stub_route("^PUT$", "update", "api/v1/sample", "/api/v1/sample/:id(.:format)"),
-    stub_route("^DELETE$", "destroy", "api/v1/sample", "/api/v1/sample/:id(.:format)")
+    stub_route("^DELETE$", "destroy", "api/v1/sample", "/api/v1/sample/:id(.:format)"),
+    stub_route("^GET$", "new", "api/v1/sample", "/api/v1/sample/new(.:format)")
   ]}
 
   context "without controller base path" do
@@ -68,7 +69,7 @@ describe Swagger::Docs::Generator do
         expect(response["resourcePath"]).to eq "sample"
       end
       it "writes out expected api count" do
-        expect(response["apis"].count).to eq 6
+        expect(response["apis"].count).to eq 7
       end
       context "first api" do
         #"apis":[{"path":" /sample","operations":[{"summary":"Fetches all User items"
@@ -186,7 +187,7 @@ describe Swagger::Docs::Generator do
           expect(response["resourcePath"]).to eq "sample"
         end
         it "writes out expected api count" do
-          expect(response["apis"].count).to eq 6
+          expect(response["apis"].count).to eq 7
         end
         context "first api" do
           let(:api) { response["apis"][0] }
