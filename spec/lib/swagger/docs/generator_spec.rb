@@ -23,6 +23,7 @@ describe Swagger::Docs::Generator do
   let(:routes) {[
     stub_route("^GET$", "index", "api/v1/ignored", "/api/v1/ignored(.:format)"),
     stub_route("^GET$", "index", "api/v1/sample", "/api/v1/sample(.:format)"),
+    stub_route("^GET$", "index", "api/v1/sample", "/api/v1/nested/:nested_id/sample(.:format)"),
     stub_route("^POST$", "create", "api/v1/sample", "/api/v1/sample(.:format)"),
     stub_route("^GET$", "show", "api/v1/sample", "/api/v1/sample/:id(.:format)"),
     stub_route("^PUT$", "update", "api/v1/sample", "/api/v1/sample/:id(.:format)"),
@@ -30,7 +31,7 @@ describe Swagger::Docs::Generator do
   ]}
 
   context "without controller base path" do
-    let(:config) { 
+    let(:config) {
       {
         DEFAULT_VER => {:api_file_path => "#{TMP_DIR}api/v1/", :base_path => "http://api.no.where"}
       }
@@ -67,7 +68,7 @@ describe Swagger::Docs::Generator do
         expect(response["resourcePath"]).to eq "sample"
       end
       it "writes out expected api count" do
-        expect(response["apis"].count).to eq 5
+        expect(response["apis"].count).to eq 6
       end
       context "first api" do
         #"apis":[{"path":" /sample","operations":[{"summary":"Fetches all User items"
@@ -83,7 +84,7 @@ describe Swagger::Docs::Generator do
     let(:config) { Swagger::Docs::Config.register_apis({
       DEFAULT_VER => {:controller_base_path => "api/v1", :api_file_path => "#{TMP_DIR}api/v1/", :base_path => "http://api.no.where"}
     })}
-    before(:each) do 
+    before(:each) do
       Rails.stub_chain(:application, :routes, :routes).and_return(routes)
       Swagger::Docs::Generator.set_real_methods
       require "fixtures/controllers/sample_controller"
@@ -100,7 +101,7 @@ describe Swagger::Docs::Generator do
 
     describe "#write_docs" do
       context "no apis registered" do
-        before(:each) do 
+        before(:each) do
           Swagger::Docs::Config.register_apis({})
         end
         it "generates using default config" do
@@ -168,8 +169,7 @@ describe Swagger::Docs::Generator do
       context "resource file" do
         let(:resource) { FILE_RESOURCE.read }
         let(:response) { JSON.parse(resource) }
-        let(:first) { response["apis"].first }
-        let(:operations) { first["operations"] }
+        let(:operations) { api["operations"] }
         let(:params) { operations.first["parameters"] }
         let(:response_msgs) { operations.first["responseMessages"] }
         # {"apiVersion":"1.0","swaggerVersion":"1.2","basePath":"/api/v1","resourcePath":"/sample"
@@ -186,18 +186,19 @@ describe Swagger::Docs::Generator do
           expect(response["resourcePath"]).to eq "sample"
         end
         it "writes out expected api count" do
-          expect(response["apis"].count).to eq 5
+          expect(response["apis"].count).to eq 6
         end
         context "first api" do
+          let(:api) { response["apis"][0] }
           #"apis":[{"path":" /sample","operations":[{"summary":"Fetches all User items"
           #,"method":"get","nickname":"Api::V1::Sample#index"}]
           it "writes path correctly when api extension type is not set" do
-            expect(first["path"]).to eq "sample"
+            expect(api["path"]).to eq "sample"
           end
           it "writes path correctly when api extension type is set" do
             config[DEFAULT_VER][:api_extension_type] = :json
             generate(config)
-            expect(first["path"]).to eq "sample.json"
+            expect(api["path"]).to eq "sample.json"
           end
           it "writes summary correctly" do
             expect(operations.first["summary"]).to eq "Fetches all User items"
@@ -208,7 +209,10 @@ describe Swagger::Docs::Generator do
           it "writes nickname correctly" do
             expect(operations.first["nickname"]).to eq "Api::V1::Sample#index"
           end
-          #"parameters":[{"paramType":"query","name":"page","type":"integer","description":"Page number","required":false}]
+          #"parameters"=>[
+          # {"paramType"=>"query", "name"=>"page", "type"=>"integer", "description"=>"Page number", "required"=>false},
+          # {"paramType"=>"path", "name"=>"nested_id", "type"=>"integer", "description"=>"Team Id", "required"=>false}], "responseMessages"=>[{"code"=>401, "message"=>"Unauthorized"}, {"code"=>406, "message"=>"The request you made is not acceptable"}, {"code"=>416, "message"=>"Requested Range Not Satisfiable"}], "method"=>"get", "nickname"=>"Api::V1::Sample#index"}
+          #]
           context "parameters" do
             it "has correct count" do
               expect(params.count).to eq 1
@@ -243,6 +247,50 @@ describe Swagger::Docs::Generator do
             it "writes specified message correctly" do
               expect(response_msgs[1]["message"]).to eq "The request you made is not acceptable"
             end
+          end
+        end
+        context "second api (nested)" do
+          let(:api) { response["apis"][1] }
+          context "parameters" do
+            it "has correct count" do
+              expect(params.count).to eq 2
+            end
+          end
+        end
+        context "update api" do
+          let(:api) { response["apis"][4] }
+          it "writes model param correctly" do
+            expected_param = {
+              "paramType" => "form",
+              "name" => "tag",
+              "type" => "Tag",
+              "description" => "Tag object",
+              "required" => true,
+            }
+            expect(params.last).to eq expected_param
+          end
+        end
+        context "models" do
+          let(:models) { response["models"] }
+          # Based on https://github.com/wordnik/swagger-core/wiki/Datatypes
+          it "writes model correctly" do
+            expected_model = {
+              "id" => "Tag",
+              "required" => ["id"],
+              "description" => "A Tag object.",
+              "properties" => {
+                "name" => {
+                  "type" => "string",
+                  "description" => "Name",
+                  "foo" => "test",
+                },
+                "id" => {
+                  "type" => "integer",
+                  "description" => "User Id",
+                }
+              }
+            }
+            expect(models['Tag']).to eq expected_model
           end
         end
       end

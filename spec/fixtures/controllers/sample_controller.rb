@@ -8,6 +8,7 @@ module Api
       swagger_api :index do
         summary "Fetches all User items"
         param :query, :page, :integer, :optional, "Page number"
+        param :path, :nested_id, :integer, :optional, "Team Id"
         response :unauthorized
         response :not_acceptable, "The request you made is not acceptable"
         response :requested_range_not_satisfiable
@@ -36,6 +37,7 @@ module Api
         param :form, :first_name, :string, :optional, "First name"
         param :form, :last_name, :string, :optional, "Last name"
         param :form, :email, :string, :optional, "Email address"
+        param :form, :tag, :Tag, :required, "Tag object"
         response :unauthorized
         response :not_found
         response :not_acceptable
@@ -48,6 +50,13 @@ module Api
         response :not_found
       end
 
+      # Support for Swagger complex types:
+      # https://github.com/wordnik/swagger-core/wiki/Datatypes#wiki-complex-types
+      swagger_model :Tag do
+        description "A Tag object."
+        property :id, :integer, :required, "User Id"
+        property :name, :string, :optional, "Name", foo: "test"
+      end
     end
   end
 end

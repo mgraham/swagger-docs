@@ -1,30 +1,45 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'swagger/docs/version'
+# -*- encoding: utf-8 -*-
+# stub: swagger-docs 0.1.1 ruby lib
 
-Gem::Specification.new do |spec|
-  spec.name          = "swagger-docs"
-  spec.version       = Swagger::Docs::VERSION
-  spec.authors       = ["Rich Hollis"]
-  spec.email         = ["richhollis@gmail.com"]
-  spec.description   = %q{Generates json files for rails apps to use with swagger-ui}
-  spec.summary       = %q{Generates swagger-ui json files for rails apps with APIs. You add the swagger DSL to your controller classes and then run one rake task to generate the json files.
-}
-  spec.homepage      = "https://github.com/richhollis/swagger-docs"
-  spec.license       = "MIT"
+Gem::Specification.new do |s|
+  s.name = "swagger-docs"
+  s.version = "0.1.1"
 
-  spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = ["lib"]
+  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.require_paths = ["lib"]
+  s.authors = ["Rich Hollis"]
+  s.cert_chain = ["certs/gem-public_cert.pem"]
+  s.date = "2014-05-28"
+  s.description = "Generates json files for rails apps to use with swagger-ui"
+  s.email = ["richhollis@gmail.com"]
+  s.files = [".gitignore", "Appraisals", "CHANGELOG.md", "Gemfile", "LICENSE.txt", "README.md", "Rakefile", "certs/gem-public_cert.pem", "lib/swagger/docs.rb", "lib/swagger/docs/config.rb", "lib/swagger/docs/dsl.rb", "lib/swagger/docs/generator.rb", "lib/swagger/docs/impotent_methods.rb", "lib/swagger/docs/methods.rb", "lib/swagger/docs/task.rb", "lib/swagger/docs/version.rb", "lib/tasks/swagger.rake", "spec/fixtures/controllers/application_controller.rb", "spec/fixtures/controllers/ignored_controller.rb", "spec/fixtures/controllers/sample_controller.rb", "spec/lib/swagger/docs/generator_spec.rb", "spec/spec_helper.rb", "swagger-docs.gemspec"]
+  s.homepage = "https://github.com/richhollis/swagger-docs"
+  s.licenses = ["MIT"]
+  s.rubygems_version = "2.2.2"
+  s.summary = "Generates swagger-ui json files for rails apps with APIs. You add the swagger DSL to your controller classes and then run one rake task to generate the json files."
+  s.test_files = ["spec/fixtures/controllers/application_controller.rb", "spec/fixtures/controllers/ignored_controller.rb", "spec/fixtures/controllers/sample_controller.rb", "spec/lib/swagger/docs/generator_spec.rb", "spec/spec_helper.rb"]
 
-  spec.cert_chain  = ['certs/gem-public_cert.pem']
-  spec.signing_key = File.expand_path("~/.gemcert/gem-private_key.pem") if $0 =~ /gem\z/
+  if s.respond_to? :specification_version then
+    s.specification_version = 4
 
-  spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec"
-  spec.add_development_dependency "rails"
-  spec.add_development_dependency "appraisal"
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_development_dependency(%q<bundler>, ["~> 1.3"])
+      s.add_development_dependency(%q<rake>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, [">= 0"])
+      s.add_development_dependency(%q<rails>, [">= 0"])
+      s.add_development_dependency(%q<appraisal>, [">= 0"])
+    else
+      s.add_dependency(%q<bundler>, ["~> 1.3"])
+      s.add_dependency(%q<rake>, [">= 0"])
+      s.add_dependency(%q<rspec>, [">= 0"])
+      s.add_dependency(%q<rails>, [">= 0"])
+      s.add_dependency(%q<appraisal>, [">= 0"])
+    end
+  else
+    s.add_dependency(%q<bundler>, ["~> 1.3"])
+    s.add_dependency(%q<rake>, [">= 0"])
+    s.add_dependency(%q<rspec>, [">= 0"])
+    s.add_dependency(%q<rails>, [">= 0"])
+    s.add_dependency(%q<appraisal>, [">= 0"])
+  end
 end
